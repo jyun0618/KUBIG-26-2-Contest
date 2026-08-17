@@ -26,16 +26,15 @@ if not os.environ.get("GEMINI_API_KEY"):
 
 st.subheader("예시 입력")
 cols = st.columns(3)
-if "user_text" not in st.session_state:
-    st.session_state.user_text = ""
+if "user_text_area" not in st.session_state:
+    st.session_state.user_text_area = ""
 
 for i, (label, text) in enumerate(EXAMPLES):
     if cols[i % 3].button(label, use_container_width=True):
-        st.session_state.user_text = text
+        st.session_state.user_text_area = text
 
 user_text = st.text_area(
     "안내문, 문자메시지, 또는 금융 상황을 입력하세요",
-    value=st.session_state.user_text,
     height=120,
     key="user_text_area",
 )

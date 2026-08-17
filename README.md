@@ -6,7 +6,7 @@
 ## 실행 방법
 
 ```bash
-cd finbridge_demo
+cd finbridge_chatbot
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

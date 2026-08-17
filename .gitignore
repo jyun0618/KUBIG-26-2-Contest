@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
 data/.cache/
+.venv/
+.env
+.DS_Store
 
 # 히스토리/참고용 원본 자료 — 로컬엔 두되 git엔 올리지 않음.
 # 파이프라인이 실제로 쓰는 건 data/Retriever_dataset/ + data/rag_evaluation_dataset.jsonl뿐이라

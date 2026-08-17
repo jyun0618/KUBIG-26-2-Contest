@@ -1,0 +1,101 @@
+{
+  "_notice": "SMOKE-TEST용 예시 평가셋 (6문항). data/chunks.json의 placeholder 7개를 대상으로 파이프라인/평가 스크립트가 도는지 확인하는 용도. 유한이 만들 실제 80문항 평가셋도 이 스키마(question/language/scenario/category/gold[])를 따르면 그대로 호환된다. gold는 chunk_id가 아니라 institution/document_title(or source_url)+page+evidence_sentence로 구성 — 06번 섹션 팀 결정 반영.",
+  "items": [
+    {
+      "id": "q001",
+      "question": "외국인 유학생이 국내 은행에서 계좌를 개설하려면 어떤 서류가 필요해?",
+      "language": "ko",
+      "scenario": "guidance",
+      "category": "account_card",
+      "gold": [
+        {
+          "institution": "서울글로벌센터 (예시)",
+          "document_title": "외국인 유학생 금융생활 가이드 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-seoulglobal-guide",
+          "page": 4,
+          "evidence_sentence": "외국인 유학생이 국내 은행에서 계좌를 개설하려면 여권과 외국인등록증(또는 통합신청서 접수확인서)이 필수로 요구된다."
+        }
+      ]
+    },
+    {
+      "id": "q002",
+      "question": "Do I need a certificate of enrollment to open a bank account as a foreign student?",
+      "language": "en",
+      "scenario": "guidance",
+      "category": "account_card",
+      "gold": [
+        {
+          "institution": "서울글로벌센터 (예시)",
+          "document_title": "외국인 유학생 금융생활 가이드 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-seoulglobal-guide",
+          "page": 4,
+          "evidence_sentence": "재학증명서는 학교·은행에 따라 추가로 요구될 수 있는 조건부 서류이며, 모든 은행에서 항상 요구되는 것은 아니다."
+        }
+      ]
+    },
+    {
+      "id": "q003",
+      "question": "해외로 돈을 보낼 때 한도가 어떻게 돼?",
+      "language": "ko",
+      "scenario": "guidance",
+      "category": "remittance",
+      "gold": [
+        {
+          "institution": "금융감독원 (예시)",
+          "document_title": "외국인을 위한 금융생활 가이드북 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-fss-guidebook",
+          "page": 13,
+          "evidence_sentence": "건당 또는 1일 해외송금 한도는 은행 및 상품에 따라 다르며, 일부 은행은 최초 거래 시 여권과 외국인등록증 원본 제시를 필수로 요구한다."
+        }
+      ]
+    },
+    {
+      "id": "q004",
+      "question": "How much can I send overseas at once, and are there extra documents required for the first transfer?",
+      "language": "en",
+      "scenario": "guidance",
+      "category": "remittance",
+      "gold": [
+        {
+          "institution": "금융감독원 (예시)",
+          "document_title": "외국인을 위한 금융생활 가이드북 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-fss-guidebook",
+          "page": 12,
+          "evidence_sentence": "비대면 또는 창구를 통한 해외송금 시, 최초 거래 은행에서는 거래 목적 확인을 위해 재학증명서, 근로계약서, 거주지 증빙 등 추가 서류를 요구할 수 있다."
+        }
+      ]
+    },
+    {
+      "id": "q005",
+      "question": "검찰청이라면서 안전계좌로 돈을 보내라고 문자가 왔는데 진짜야?",
+      "language": "ko",
+      "scenario": "suspicious_message",
+      "category": "fraud_safety",
+      "gold": [
+        {
+          "institution": "KISA (예시)",
+          "document_title": "스미싱·기관사칭 문자 예방 안내 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-kisa-smishing",
+          "page": 2,
+          "evidence_sentence": "검찰청, 경찰청, 금융감독원 등 공공기관은 문자메시지로 계좌 이체나 '안전계좌' 입금을 요구하지 않는다."
+        }
+      ]
+    },
+    {
+      "id": "q006",
+      "question": "장학금 준다면서 먼저 수수료를 보내라는 이메일을 받았는데 사기인지 확인하고 싶어",
+      "language": "ko",
+      "scenario": "suspicious_message",
+      "category": "fraud_safety",
+      "gold": [
+        {
+          "institution": "금융감독원 (예시)",
+          "document_title": "외국인을 위한 금융생활 가이드북 - 금융사기 예방 (발췌 예시)",
+          "source_url": "https://example.org/PLACEHOLDER-fss-guidebook-fraud",
+          "page": 7,
+          "evidence_sentence": "해외 유학생을 대상으로 한 채용사기·장학금사기는 선입금(수수료, 보증금)을 요구하거나 개인 계좌·인증정보를 요구하는 경우가 많다."
+        }
+      ]
+    }
+  ]
+}

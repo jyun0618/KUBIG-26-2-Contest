@@ -1,20 +1,19 @@
-import json
 import os
 import re
-from pathlib import Path
 from typing import List
 
 from google import genai
 from google.genai import types
 
+from retrieval._retry import call_with_retry
+from retrieval.corpus_loader import load_real_corpus
+from retrieval.hybrid import HybridRetriever
 from schemas import ExtractionResult, StructuredAnswer
 
-DATA_PATH = Path(__file__).parent / "data" / "chunks.json"
-MODEL_NAME = "gemini-2.0-flash"
-
-_STOPWORDS = {"the", "a", "an", "is", "are", "to", "of", "and", "or", "이", "가", "을", "를", "은", "는", "의", "에", "에서"}
+MODEL_NAME = "gemini-3.6-flash"
 
 _client = None
+_retriever = None
 
 
 def _get_client() -> genai.Client:
@@ -28,28 +27,20 @@ def _get_client() -> genai.Client:
 
 
 def load_chunks() -> List[dict]:
-    with open(DATA_PATH, encoding="utf-8") as f:
-        return json.load(f)["chunks"]
+    return load_real_corpus()
 
 
-def _tokenize(text: str) -> set:
-    words = re.findall(r"[가-힣]+|[A-Za-z]+", text.lower())
-    return {w for w in words if w not in _STOPWORDS and len(w) > 1}
+def _get_retriever() -> HybridRetriever:
+    """BM25+Dense 인덱스는 구축 비용(임베딩 API 호출)이 있으므로 프로세스당 한 번만 만든다."""
+    global _retriever
+    if _retriever is None:
+        _retriever = HybridRetriever(load_chunks())
+    return _retriever
 
 
 def select_chunks(scenario: str, user_text: str, top_k: int = 4) -> List[dict]:
-    chunks = [c for c in load_chunks() if c["scenario"] == scenario]
-    query_tokens = _tokenize(user_text)
-    scored = []
-    for c in chunks:
-        chunk_tokens = _tokenize(c["text"])
-        overlap = len(query_tokens & chunk_tokens)
-        scored.append((overlap, c))
-    scored.sort(key=lambda x: x[0], reverse=True)
-    selected = [c for _, c in scored[:top_k]]
-    if not selected:
-        selected = chunks[:top_k]
-    return selected
+    """BM25 + Dense를 RRF로 융합한 Hybrid Retrieval."""
+    return _get_retriever().retrieve(scenario=scenario, query=user_text, top_k=top_k)
 
 
 def extract_info(user_text: str) -> ExtractionResult:
@@ -61,13 +52,15 @@ scenario는 안내문/공지/조건 설명이면 "guidance", 문자메시지/의
 입력:
 \"\"\"{user_text}\"\"\"
 """
-    resp = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=ExtractionResult,
-        ),
+    resp = call_with_retry(
+        lambda: client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ExtractionResult,
+            ),
+        )
     )
     return ExtractionResult.model_validate_json(resp.text)
 
@@ -95,13 +88,15 @@ def generate_answer(user_text: str, extraction: ExtractionResult, chunks: List[d
 sources 필드에는 위 근거의 "기관명 - 문서명 (발행일)" 형식으로 실제로 답변에 사용한 것만 넣으세요.
 guidance 시나리오면 risk_signals는 비워도 됩니다. suspicious_message 시나리오면 risk_signals를 반드시 채우세요.
 """
-    resp = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=StructuredAnswer,
-        ),
+    resp = call_with_retry(
+        lambda: client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=StructuredAnswer,
+            ),
+        )
     )
     return StructuredAnswer.model_validate_json(resp.text)
 
