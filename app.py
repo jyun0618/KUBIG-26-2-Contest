@@ -19,7 +19,7 @@ EXAMPLES = [
 ]
 
 st.title("🏦 FinBridge Korea — Demo")
-st.caption("외국인 금융 안내문 해석 + 의심 메시지 확인 Agent (프로토타입, 근거 데이터는 데모용 예시입니다)")
+st.caption("외국인 금융 안내문 해석 + 의심 메시지 확인 Agent (프로토타입, 근거는 실제 공식문서 코퍼스 기반)")
 
 if not os.environ.get("GEMINI_API_KEY"):
     st.warning("GEMINI_API_KEY가 설정되어 있지 않습니다. `.env` 파일에 키를 넣거나 터미널에서 export 하세요.", icon="⚠️")

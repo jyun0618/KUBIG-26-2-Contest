@@ -1,7 +1,8 @@
-# FinBridge Korea — 90분 데모
+# FinBridge Korea
 
-시나리오 B(안내문 해석) + C(의심 메시지 확인)만 다루는 초경량 프로토타입입니다.
-`data/chunks.json`의 근거 문서는 실제 원문이 아닌 **데모용 예시 텍스트**입니다.
+국내 체류 외국인이 금융기관·공공기관 안내문(시나리오 B) 또는 의심 문자(시나리오 C)를
+입력하면, 실제 공식 문서 코퍼스 기반 BM25+Dense 하이브리드 검색으로 근거를 찾아
+핵심 조건·위험 신호를 추출하고 "지금 할 일 / 하지 말아야 할 일"을 제시하는 프로토타입입니다.
 
 ## 실행 방법
 
@@ -19,14 +20,21 @@ streamlit run app.py
 
 ## 구조
 
-- `data/chunks.json` — 데모용 근거 문서 조각 (B 3개 + C 4개)
+- `data/Retriever_dataset/` — 실제 공식문서 코퍼스(21개 문서, chunk 버전 3종) + 통계/중복 메타데이터. 팀 공유용 최종 산출물
+- `data/rag_evaluation_dataset.jsonl` — 검색 성능 평가셋 (120문항, ko/en)
 - `schemas.py` — 추출/답변 Pydantic 스키마
-- `pipeline.py` — 추출 → 근거 선택(키워드 매칭) → 답변 생성 → 간이 검증
+- `retrieval/` — BM25(`bm25s`) + Dense(`gemini-embedding-001`) 하이브리드 검색 모듈: RRF fusion, 리랭커, 한국어 토크나이저(`kiwipiepy`), 쿼리 번역
+- `pipeline.py` — 추출 → 하이브리드 검색으로 근거 선택 → 답변 생성(`gemini-3.6-flash`) → 간이 검증
+- `eval/` — 검색 성능 평가 스크립트 (BM25/Dense/Hybrid 비교, Recall@k·MRR@k·nDCG@k, 언어별 breakdown)
 - `app.py` — Streamlit UI, 6개 예시 버튼 포함
 
-## 다음 단계 (본 MVP로 확장 시)
+## 검색 성능 평가 실행
 
-- `data/chunks.json`을 실제 PDF에서 발췌한 원문 + 실제 출처 URL로 교체
-- BM25 + 다국어 임베딩 기반 하이브리드 검색으로 `select_chunks` 대체
+```bash
+python -m eval.run_retrieval_eval --eval-set data/rag_evaluation_dataset.jsonl --split validation
+```
+
+## 다음 단계
+
 - 시나리오 A(일반 질문) 추가
-- 평가셋 80개로 정량 평가
+- 검색 단계뿐 아니라 최종 답변 생성 단계의 정성/정량 평가
