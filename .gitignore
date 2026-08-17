@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+data/.cache/
+
+# 히스토리/참고용 원본 자료 — 로컬엔 두되 git엔 올리지 않음.
+# 파이프라인이 실제로 쓰는 건 data/Retriever_dataset/ + data/rag_evaluation_dataset.jsonl뿐이라
+# 이 아래는 다시 채워도 커밋 대상에서 자동 제외됨.
+data/raw/
+data/processed/
